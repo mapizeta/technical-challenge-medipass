@@ -120,7 +120,7 @@ class LicenseCreateView(APIView):
             )
 
         paciente = paciente_serializer.validated_data
-
+        paciente["fechaNacimiento"] = paciente["fechaNacimiento"].isoformat()
 
         file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
 
