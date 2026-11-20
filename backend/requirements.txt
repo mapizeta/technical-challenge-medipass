@@ -1,0 +1,6 @@
+asgiref==3.13.0
+django==5.2.19
+djangorestframework==3.18.3
+pip==26.3
+pyjwt==2.15.1
+sqlparse==0.6.1
