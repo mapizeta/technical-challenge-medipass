@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from licencias.users import authenticate_user
 from .jwt_auth import generate_token
+from .roles import IsMedico, IsAdmin, IsAdminOrOwner
 
 class LoginView(APIView):
 
@@ -41,4 +42,40 @@ class LoginView(APIView):
                 "role": user["role"],
                 "nombre": user["nombre"],
             },
+        })
+
+class LicenseCreateView(APIView):
+    permission_classes = [IsMedico]
+
+    def post(self, request):
+        #Emitir licencia
+        pass
+
+class LicenseDetailView(APIView):
+
+    permission_classes = [IsAdminOrOwner]
+
+    def get(self, request, pk):
+        # Buscar licencia JSON.
+        # Comprobar permiso sobre el objeto.
+        pass
+
+
+class AdminTestView(APIView):
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        return Response({
+            "message": "Acceso autorizado",
+            "role": request.user.role,
+        })
+
+
+class MedicoTestView(APIView):
+    permission_classes = [IsMedico]
+
+    def get(self, request):
+        return Response({
+            "message": "Acceso autorizado",
+            "role": request.user.role,
         })
