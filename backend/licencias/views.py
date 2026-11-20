@@ -69,38 +69,39 @@ class LicenseListView(APIView):
 
         return Response(licencias)
 
+class LicenseDetailView(APIView):
+
+    permission_classes = [IsAdmin | IsMedico, IsAdminOrOwner]
+
+    def get(self, request, pk):
+
+        file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                licencias = json.load(file)
+
+        except FileNotFoundError:
+            licencias = []
+
+        licencia = next(
+            (item for item in licencias if item.get("id") == pk),
+            None
+        )
+
+        if licencia is None:
+            return Response(
+                {"error": "Licencia no encontrada."},
+                status=404
+            )
+
+        self.check_object_permissions(request, licencia)
+
+        return Response(licencia)
+
 class LicenseCreateView(APIView):
     permission_classes = [IsMedico]
 
     def post(self, request):
         #Emitir licencia
         pass
-
-class LicenseDetailView(APIView):
-
-    permission_classes = [IsAdminOrOwner]
-
-    def get(self, request, pk):
-        # Buscar licencia JSON.
-        # Comprobar permiso sobre el objeto.
-        pass
-
-
-class AdminTestView(APIView):
-    permission_classes = [IsAdmin]
-
-    def get(self, request):
-        return Response({
-            "message": "Acceso autorizado",
-            "role": request.user.role,
-        })
-
-
-class MedicoTestView(APIView):
-    permission_classes = [IsMedico]
-
-    def get(self, request):
-        return Response({
-            "message": "Acceso autorizado",
-            "role": request.user.role,
-        })
