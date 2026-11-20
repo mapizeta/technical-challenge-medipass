@@ -75,7 +75,8 @@ class JWTAuthentication(BaseAuthentication):
 
             return user, payload
 
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as e:
+            print("ERROR JWT:", type(e).__name__, str(e))
             raise AuthenticationFailed("Token inválido o expirado.")
 
         except (KeyError, TypeError, ValueError):

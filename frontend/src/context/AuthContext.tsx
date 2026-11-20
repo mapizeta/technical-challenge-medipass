@@ -23,7 +23,7 @@ interface AuthContextType {
 }
 
 interface LoginResponse {
-  token: string
+  access: string
   user: User
 }
 
@@ -43,10 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await api.post<LoginResponse>('/login', credentials)
     const data = response.data
 
-    localStorage.setItem('token', data.token)
+    localStorage.setItem('token', data.access)
     localStorage.setItem('user', JSON.stringify(data.user))
 
-    setToken(data.token)
+    setToken(data.access)
     setUser(data.user)
   }
 
