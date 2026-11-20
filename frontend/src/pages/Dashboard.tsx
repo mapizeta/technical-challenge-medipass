@@ -1,11 +1,16 @@
 
+import { useAuth } from '../context/AuthContext'
+
 export default function Dashboard() {
+  const { user } = useAuth()
+
   return (
     <div>
       <div className="mb-4">
         <h4 className="fw-bold">Dashboard</h4>
         <p className="text-secondary mb-0">
-          Resumen general de licencias médicas.
+          Bienvenido/a, {user?.nombre}.
+          {' '}Resumen general de licencias médicas.
         </p>
       </div>
 
