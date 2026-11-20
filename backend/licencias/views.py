@@ -1,5 +1,6 @@
 import json
 import uuid
+import re
 from pathlib import Path
 from datetime import datetime, timezone
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from rest_framework import status
 from licencias.users import authenticate_user
 from .jwt_auth import generate_token
 from .roles import IsMedico, IsAdmin, IsAdminOrOwner
+from licencias.serializers import PacienteSerializer #valudaciones
 
 class LoginView(APIView):
 
@@ -109,6 +111,17 @@ class LicenseCreateView(APIView):
 
         data = request.data
 
+        paciente_serializer = PacienteSerializer(data=request.data.get("paciente", {}))
+
+        if not paciente_serializer.is_valid():
+            return Response(
+                {"paciente": paciente_serializer.errors},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
+
+        paciente = paciente_serializer.validated_data
+
+
         file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
 
         try:
@@ -123,7 +136,7 @@ class LicenseCreateView(APIView):
             "folio": f"LME-{datetime.now().year}-{len(licencias) + 1:06d}",
             "fechaEmision": datetime.now(timezone.utc).isoformat(),
             "medicoId": request.user.id,
-            "paciente": data.get("paciente", {}),
+            "paciente": paciente, #data.get("paciente", {}),
             "licencia": data.get("licencia", {}),
         }
 
