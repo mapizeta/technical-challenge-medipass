@@ -1,5 +1,7 @@
 import json
+import uuid
 from pathlib import Path
+from datetime import datetime, timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -100,8 +102,37 @@ class LicenseDetailView(APIView):
         return Response(licencia)
 
 class LicenseCreateView(APIView):
+
     permission_classes = [IsMedico]
 
     def post(self, request):
-        #Emitir licencia
-        pass
+
+        data = request.data
+
+        file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                licencias = json.load(file)
+
+        except FileNotFoundError:
+            licencias = []
+
+        nueva_licencia = {
+            "id": str(uuid.uuid4()),
+            "folio": f"LME-{datetime.now().year}-{len(licencias) + 1:06d}",
+            "fechaEmision": datetime.now(timezone.utc).isoformat(),
+            "medicoId": request.user.id,
+            "paciente": data.get("paciente", {}),
+            "licencia": data.get("licencia", {}),
+        }
+
+        licencias.append(nueva_licencia)
+
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump(licencias, file, ensure_ascii=False, indent=4)
+
+        return Response(
+            nueva_licencia,
+            status=status.HTTP_201_CREATED
+        )
