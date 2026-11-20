@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -43,6 +45,29 @@ class LoginView(APIView):
                 "nombre": user["nombre"],
             },
         })
+
+class LicenseListView(APIView):
+
+    permission_classes = [IsAdmin | IsMedico]
+
+    def get(self, request):
+
+        file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                licencias = json.load(file)
+
+        except FileNotFoundError:
+            licencias = []
+
+        if request.user.role == "medico":
+            licencias = [
+                licencia for licencia in licencias
+                if licencia.get("medicoId") == request.user.id
+            ]
+
+        return Response(licencias)
 
 class LicenseCreateView(APIView):
     permission_classes = [IsMedico]

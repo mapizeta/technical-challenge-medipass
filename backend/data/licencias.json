@@ -1,0 +1,42 @@
+[
+  {
+    "id": "lic-001",
+    "folio": "LME-2026-000001",
+    "fechaEmision": "2026-11-19T10:30:00Z",
+    "medicoId": 2,
+    "paciente": {
+      "rut": "15.123.456-7",
+      "nombres": "María José",
+      "apellidos": "Pérez Soto",
+      "fechaNacimiento": "1988-04-12",
+      "email": "maria.perez@correo.cl"
+    },
+    "licencia": {
+      "tipo": "Enfermedad o accidente común",
+      "fechaInicioReposo": "2026-11-19",
+      "diasReposo": 5,
+      "diagnostico": "Cuadro gripal agudo",
+      "reposo": "Total"
+    }
+  },
+  {
+    "id": "lic-002",
+    "folio": "LME-2026-000002",
+    "fechaEmision": "2026-11-19T11:00:00Z",
+    "medicoId": 3,
+    "paciente": {
+      "rut": "16.234.567-8",
+      "nombres": "Juan Carlos",
+      "apellidos": "Muñoz Díaz",
+      "fechaNacimiento": "1990-08-21",
+      "email": "juan.munoz@correo.cl"
+    },
+    "licencia": {
+      "tipo": "Enfermedad o accidente común",
+      "fechaInicioReposo": "2026-11-19",
+      "diasReposo": 3,
+      "diagnostico": "Reposo por enfermedad",
+      "reposo": "Total"
+    }
+  }
+]
