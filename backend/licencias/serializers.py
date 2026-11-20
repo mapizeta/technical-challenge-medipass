@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from datetime import date, timedelta
 
 class PacienteSerializer(serializers.Serializer):
     rut = serializers.CharField(required=True)
@@ -37,3 +37,24 @@ class PacienteSerializer(serializers.Serializer):
             raise serializers.ValidationError("El RUT ingresado no es válido.")
 
         return rut
+
+
+class LicenciaSerializer(serializers.Serializer):
+    tipo = serializers.CharField(required=True)
+    fechaInicioReposo = serializers.DateField(required=True)
+    diasReposo = serializers.IntegerField(required=True, min_value=1, max_value=30)
+    diagnostico = serializers.CharField(required=True)
+    reposo = serializers.ChoiceField(
+        choices=["Total", "Parcial"],
+        required=True
+    )
+
+    def validate_fechaInicioReposo(self, value):
+        fecha_minima = date.today() - timedelta(days=7)
+
+        if value < fecha_minima:
+            raise serializers.ValidationError(
+                "La fecha de inicio del reposo no puede ser anterior a 7 días."
+            )
+
+        return value

@@ -10,7 +10,7 @@ from rest_framework import status
 from licencias.users import authenticate_user
 from .jwt_auth import generate_token
 from .roles import IsMedico, IsAdmin, IsAdminOrOwner
-from licencias.serializers import PacienteSerializer #valudaciones
+from licencias.serializers import PacienteSerializer, LicenciaSerializer
 
 class LoginView(APIView):
 
@@ -110,7 +110,8 @@ class LicenseCreateView(APIView):
     def post(self, request):
 
         data = request.data
-
+    
+    #Paciente validate
         paciente_serializer = PacienteSerializer(data=request.data.get("paciente", {}))
 
         if not paciente_serializer.is_valid():
@@ -121,6 +122,23 @@ class LicenseCreateView(APIView):
 
         paciente = paciente_serializer.validated_data
         paciente["fechaNacimiento"] = paciente["fechaNacimiento"].isoformat()
+
+    #Licence Validate
+
+        licencia_serializer = LicenciaSerializer(
+        data=request.data.get("licencia", {})
+        )
+
+        if not licencia_serializer.is_valid():
+            return Response(
+                {"licencia": licencia_serializer.errors},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
+
+        licencia = dict(licencia_serializer.validated_data)
+        licencia["fechaInicioReposo"] = licencia["fechaInicioReposo"].isoformat()
+
+    ##############
 
         file_path = Path(__file__).resolve().parent.parent / "data" / "licencias.json"
 
@@ -137,7 +155,7 @@ class LicenseCreateView(APIView):
             "fechaEmision": datetime.now(timezone.utc).isoformat(),
             "medicoId": request.user.id,
             "paciente": paciente, #data.get("paciente", {}),
-            "licencia": data.get("licencia", {}),
+            "licencia": licencia, #data.get("licencia", {}),
         }
 
         licencias.append(nueva_licencia)
