@@ -11,7 +11,7 @@ const api = axios.create({
 // peticiones JWT
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
-
+    console.log('Petición:', config.url, '| Token:', !!token)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

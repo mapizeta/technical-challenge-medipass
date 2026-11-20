@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -18,6 +17,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null
+  token: string | null
   login: (credentials: { email: string; password: string }) => Promise<void>
   logout: () => void
 }
@@ -27,25 +27,38 @@ interface LoginResponse {
   user: User
 }
 
-const AuthContext = createContext<AuthContextType | null>(null)
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('user')
+    return saved ? JSON.parse(saved) : null
+  })
+
+  const [token, setToken] = useState<string | null>(
+    () => localStorage.getItem('token')
+  )
 
   async function login(credentials: { email: string; password: string }) {
     const response = await api.post<LoginResponse>('/login', credentials)
+    const data = response.data
 
-    localStorage.setItem('token', response.data.token)
-    setUser(response.data.user)
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+
+    setToken(data.token)
+    setUser(data.user)
   }
 
   function logout() {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setToken(null)
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
